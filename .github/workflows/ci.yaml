@@ -1,0 +1,67 @@
+name: Continuous Integration
+
+on: [ push ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@v5
+        id: cp312
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+      - run: poetry run poetry install
+        if: steps.cp312.outputs.cache-hit != 'true'
+
+  linter:
+    name: Linter Ruff
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@v5
+        id: cp312
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+
+      - run: poetry run ruff check .
+
+  mypy:
+    name: Mypy Type Checking
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@v5
+        id: cp312
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+
+      - run: poetry run mypy .
+
+  isort:
+    name: Imports Sorting
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@v5
+        id: cp312
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+
+      - run: poetry run isort .
