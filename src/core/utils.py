@@ -1,11 +1,9 @@
 from collections.abc import Callable
 from datetime import datetime, UTC
 from functools import wraps
-from typing import Concatenate, ParamSpec, TypeVar
+from typing import ParamSpec, TypeVar
 
 from loguru import logger
-
-from src.modules.general.dto import InputConfigDTO
 
 _P = ParamSpec("_P")
 _R = TypeVar("_R")
@@ -43,14 +41,3 @@ def exception_handler_decorator(
         return default_handler
 
     return decorator
-
-
-def input_config_decorator(
-    func: Callable[Concatenate[InputConfigDTO, _P], _R],
-) -> Callable[..., _R]:
-    @wraps(func)
-    def wrapper(*_: _P.args, **kwargs: _P.kwargs) -> _R:
-        input_config = InputConfigDTO.model_validate(kwargs)
-        return func(input_config)
-
-    return wrapper
